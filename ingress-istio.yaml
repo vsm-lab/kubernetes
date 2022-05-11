@@ -1,0 +1,61 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: hka-vsmlab-gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: <domain>-tls
+    hosts:
+    - "<domain>"
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: categories-service
+spec:
+  hosts:
+  - "<domain>"
+  gateways:
+  - hka-vsmlab-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /categories/
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: categories-service
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: products-service
+spec:
+  hosts:
+  - "<domain>"
+  gateways:
+  - hka-vsmlab-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /products/
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: products-service

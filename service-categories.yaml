@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: categories-service
+  namespace: hka-vsmlab
+  labels:
+    app: vsmlab
+    tier: categories-service
+    type: service
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+      name: http-categories
+  selector:
+    app: vsmlab
+    tier: categories-service
+    type: deployment
+    version: "1.0"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: categories-service
+  namespace: hka-vsmlab
+  labels:
+    app: vsmlab
+    tier: categories-service
+    type: deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vsmlab
+      tier: categories-service
+      type: deployment
+  template:
+    metadata:
+      labels:
+        app: vsmlab
+        tier: categories-service
+        type: deployment
+        version: "1.0"
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      restartPolicy: Always
+      containers:
+      - image: bitwrk/web-shop-categories-service:latest
+        imagePullPolicy: Always
+        name: products-service
+        env:
+        - name: spring.datasource.url
+          value: "jdbc:mysql://mysql:3306/categories"
+        - name: product-service.base-url
+          value: http://products-service
+        - name: spring.datasource.password
+          valueFrom:
+              secretKeyRef:
+                name: mysql
+                key: categoriespw
+        ports:
+        - containerPort: 8080
+          name: categories
