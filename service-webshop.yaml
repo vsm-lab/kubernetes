@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: categories-service
+  name: webshop-service
   namespace: hka-vsmlab
   labels:
     app: vsmlab
-    tier: categories-service
+    tier: webshop-service
     type: service
 spec:
   ports:
@@ -15,31 +15,31 @@ spec:
       name: http-categories
   selector:
     app: vsmlab
-    tier: categories-service
+    tier: webshop-service
     type: deployment
     version: "1.0"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: categories-service
+  name: webshop-service
   namespace: hka-vsmlab
   labels:
     app: vsmlab
-    tier: categories-service
+    tier: webshop-service
     type: deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: vsmlab
-      tier: categories-service
+      tier: webshop-service
       type: deployment
   template:
     metadata:
       labels:
         app: vsmlab
-        tier: categories-service
+        tier: webshop-service
         type: deployment
         version: "1.0"
       annotations:
@@ -47,19 +47,21 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        - image: bitwrk/web-shop-categories-service:latest
+        - image: bitwrk/web-shop-legacy:latest
           imagePullPolicy: Always
-          name: products-service
+          name: webshop-service
           env:
-            - name: spring.datasource.url
-              value: "jdbc:mysql://mysql:3306/categories"
             - name: products-service.base-url
               value: http://products-service
-            - name: spring.datasource.password
+            - name: categories-service.base-url
+              value: http://categories-service
+            - name: USERMANAGEMENT_DB_URL
+              value: "jdbc:mysql://mysql:3306/usermanagement"
+            - name: USERMANAGEMENT_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: mysql
-                  key: categoriespw
+                  key: usermanagementpw
           ports:
             - containerPort: 8080
-              name: categories
+              name: webshop

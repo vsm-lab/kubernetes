@@ -46,19 +46,19 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-      - image: bitwrk/web-shop-products-service:latest
-        imagePullPolicy: Always
-        name: products-service
-        env:
-        - name: spring.datasource.url
-          value: "jdbc:mysql://mysql:3306/products"
-        - name: category-service.base-url
-          value: http://categories-service
-        - name: spring.datasource.password
-          valueFrom:
-              secretKeyRef:
-                name: mysql
-                key: productspw
-        ports:
-        - containerPort: 8080
-          name: products
+        - image: bitwrk/web-shop-products-service:latest
+          imagePullPolicy: Always
+          name: products-service
+          env:
+            - name: spring.datasource.url
+              value: "jdbc:mysql://mysql:3306/products"
+            - name: categories-service.base-url
+              value: http://categories-service
+            - name: spring.datasource.password
+              valueFrom:
+                secretKeyRef:
+                  name: mysql
+                  key: productspw
+          ports:
+            - containerPort: 8080
+              name: products

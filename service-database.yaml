@@ -8,7 +8,7 @@ metadata:
     tier: database
     type: storage
 spec:
-  storageClassName: longhorn
+  storageClassName: hostpath
   accessModes: [ReadWriteOnce]
   resources:
     requests:
@@ -23,10 +23,9 @@ metadata:
     app: vsmlab
     tier: database
     type: secret
-  annotations:
-    secret-generator.v1.mittwald.de/autogenerate: rootpw
 stringData:
   database: default
+  rootpw: eurPMsOohfSDKKss8dD=sW5WLod9
   productspw: FLLzmWv0QHhepVFh37HC0cTQ7kpmsIIE
   categoriespw: cG3zpoZLasOkpbAg67HzrvIOSAT3rCVC
   usermanagementpw: Q1eU2RGSv31iY0GCnPN5kdIWo82Cbns62Wt8PJL+
@@ -78,42 +77,42 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-      - image: docker.io/bitwrk/web-shop-database:latest
-        name: mysql
-        env:
-        - name: MYSQL_DATABASE
-          valueFrom:
-              secretKeyRef:
-                name: mysql
-                key: database
-        - name: MYSQL_ROOT_PASSWORD
-          valueFrom:
-              secretKeyRef:
-                name: mysql
-                key: rootpw
-        - name: MYSQL_PRODUCTS_PASSWORD
-          valueFrom:
-              secretKeyRef:
-                name: mysql
-                key: productspw
-        - name: MYSQL_CATEGORIES_PASSWORD
-          valueFrom:
-              secretKeyRef:
-                name: mysql
-                key: categoriespw
-        - name: MYSQL_USERMANAGEMENT_PASSWORD
-          valueFrom:
-              secretKeyRef:
-                name: mysql
-                key: usermanagementpw
-        ports:
-        - containerPort: 3306
+        - image: docker.io/bitwrk/web-shop-database:latest
           name: mysql
-        volumeMounts:
-        - name: mysql-volume
-          mountPath: /var/lib/mysql
-          subPath: data
+          env:
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mysql
+                  key: database
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql
+                  key: rootpw
+            - name: MYSQL_PRODUCTS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql
+                  key: productspw
+            - name: MYSQL_CATEGORIES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql
+                  key: categoriespw
+            - name: MYSQL_USERMANAGEMENT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql
+                  key: usermanagementpw
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: mysql-volume
+              mountPath: /var/lib/mysql
+              subPath: data
       volumes:
-      - name: mysql-volume
-        persistentVolumeClaim:
-          claimName: mysql-pvc
+        - name: mysql-volume
+          persistentVolumeClaim:
+            claimName: mysql-pvc
